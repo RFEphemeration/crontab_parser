@@ -1,0 +1,4 @@
+This is a crontab parser for python, updated from
+http://www.koders.com/python/fidA55A9DB55093A78DD26B55C606B267B2C5063A79.aspx?s=config
+
+Currently next_run works, though prev_run gets stuck in an infinite loop when going back one month. I had to do a workaround for next_run, but more significant changes will probably be required for prev_run
