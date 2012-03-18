@@ -249,7 +249,7 @@ class SimpleCrontabEntry(object):
     def __next_minute(self, minute, sol):
         """Find next minute of execution given the minute arg."""
         sol['minute'], carry = self.__next_time(self.fields['minute'], minute)
-        if carry:
+        if carry or minute == sol['minute']:
             self.__next_hour(sol['hour']+1, sol)
         return True
 
