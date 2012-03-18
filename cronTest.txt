@@ -3,6 +3,39 @@
 
 
 
+``matches`` method testing:
+
+
+
+>>> e = SimpleCrontabEntry('30 8 10 6 *')
+
+>>> e.matches(datetime(1970, 6, 10, 8, 30))
+True
+>>> e.matches(datetime(1970, 6, 10, 8, 31))
+False
+
+>>> e = SimpleCrontabEntry('* * * * 0')
+
+>>> e.matches(datetime(1970, 1, 4))
+True
+>>> e.matches(datetime(1970, 1, 1))
+False
+
+>>> e = SimpleCrontabEntry('* 5 * * 7')
+
+>>> e.matches(datetime(1970, 1, 4, 5))
+True
+>>> e.matches(datetime(1970, 1, 1, 5))
+False
+>>> e.matches(datetime(1970, 1, 4))
+False
+
+
+
+``next_run`` method testing:
+
+
+
 >>> e = SimpleCrontabEntry('30 8 10 6 *')
 
 >>> e.next_run(datetime(1970, 1, 1))
@@ -37,6 +70,10 @@ datetime.datetime(1970, 1, 1, 16, 0)
 
 
 
+``prev_run`` method testing:
+
+
+
 >>> e = SimpleCrontabEntry('30 8 10 6 *')
 
 >>> e.prev_run(datetime(1970, 1, 1))
@@ -50,28 +87,3 @@ datetime.datetime(1969, 6, 10, 8, 30)
 datetime.datetime(1969, 12, 31, 16, 0)
 >>> e.prev_run(datetime(1970, 1, 1, 13, 30))
 datetime.datetime(1970, 1, 1, 11, 0)
-
-
-
->>> e = SimpleCrontabEntry('30 8 10 6 *')
-
->>> e.matches(datetime(1970, 6, 10, 8, 30))
-True
->>> e.matches(datetime(1970, 6, 10, 8, 31))
-False
-
->>> e = SimpleCrontabEntry('* * * * 0')
-
->>> e.matches(datetime(1970, 1, 4))
-True
->>> e.matches(datetime(1970, 1, 1))
-False
-
->>> e = SimpleCrontabEntry('* 5 * * 7')
-
->>> e.matches(datetime(1970, 1, 4, 5))
-True
->>> e.matches(datetime(1970, 1, 1, 5))
-False
->>> e.matches(datetime(1970, 1, 4))
-False
