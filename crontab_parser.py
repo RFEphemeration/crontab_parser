@@ -354,6 +354,15 @@ class SimpleCrontabEntry(object):
             return False
         return True
 
+    
+    def matches(self, time = datetime.datetime.now()):
+        """Checks if given time matches cron pattern."""
+        return time.month in self.fields['month'] and \
+            time.day in self.fields['day'] and \
+            time.hour in self.fields['hour'] and \
+            time.minute in self.fields['minute'] and \
+            time.weekday() + 1 in [d or 7 for d in self.fields['weekday']]
+
 
     def next_run(self, time = datetime.datetime.now()):
         """Calculates when will the next execution be."""
