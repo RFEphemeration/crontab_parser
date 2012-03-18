@@ -28,14 +28,32 @@ datetime.datetime(1970, 6, 10, 8, 30)
 >>> e.next_run(datetime(1970, 6, 10, 8, 30))
 datetime.datetime(1971, 6, 10, 8, 30)
 
+>>> e = SimpleCrontabEntry('0 11,16 * * *')
 
+>>> e.next_run(datetime(1970, 1, 1))
+datetime.datetime(1970, 1, 1, 11, 0)
+>>> e.next_run(datetime(1970, 1, 1, 14, 30))
+datetime.datetime(1970, 1, 1, 16, 0)
+
+
+
+>>> e = SimpleCrontabEntry('30 8 10 6 *')
 
 >>> e.prev_run(datetime(1970, 1, 1))
 datetime.datetime(1969, 6, 10, 8, 30)
 >>> e.prev_run(datetime(1970, 6, 10, 8, 30))
 datetime.datetime(1969, 6, 10, 8, 30)
 
+>>> e = SimpleCrontabEntry('0 11,16 * * *')
 
+>>> e.prev_run(datetime(1970, 1, 1))
+datetime.datetime(1969, 12, 31, 16, 0)
+>>> e.prev_run(datetime(1970, 1, 1, 13, 30))
+datetime.datetime(1970, 1, 1, 11, 0)
+
+
+
+>>> e = SimpleCrontabEntry('30 8 10 6 *')
 
 >>> e.matches(datetime(1970, 6, 10, 8, 30))
 True

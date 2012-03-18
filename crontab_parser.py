@@ -249,7 +249,7 @@ class SimpleCrontabEntry(object):
     def __next_minute(self, minute, sol):
         """Find next minute of execution given the minute arg."""
         sol['minute'], carry = self.__next_time(self.fields['minute'], minute)
-        if carry or minute == sol['minute']:
+        if carry:
             self.__next_hour(sol['hour']+1, sol)
         return True
 
@@ -361,11 +361,13 @@ class SimpleCrontabEntry(object):
             time.day in self.fields['day'] and \
             time.hour in self.fields['hour'] and \
             time.minute in self.fields['minute'] and \
-            time.weekday() + 1 in [d or 7 for d in self.fields['weekday']]
+            time.weekday() + 1 in [d or 7 for d in self.fields['weekday']] # Sunday may be represented as ``0`` or ``7``.
 
 
     def next_run(self, time = datetime.datetime.now()):
         """Calculates when will the next execution be."""
+        if self.matches(time):
+            time += datetime.timedelta(minutes = 1)
         sol = {'minute': time.minute, 'hour': time.hour, 'day': time.day, 'month' : time.month, 'year' : time.year}
         # next_month if calculated first as next_day depends on
         # it. Also if next_month is different than time.month the
