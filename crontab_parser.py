@@ -384,7 +384,7 @@ class SimpleCrontabEntry(object):
 
     def prev_run(self, time = datetime.datetime.now()):
         """Calculates when the previous execution was."""
-        base = self.next_run(time)
+        base = self.matches(time) and time or self.next_run(time)
         # minute
         prev_minute, carry = self.__prev_time(self.fields['minute'], base.minute)
         min_diff = datetime.timedelta(minutes=(base.minute - prev_minute))
