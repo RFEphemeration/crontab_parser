@@ -221,15 +221,7 @@ class SimpleCrontabEntry(object):
             carry = True
             sol = time_list[0]
         else:
-            if not carry:
-                sol = tmp[0]
-            else :
-                if len(tmp) == 1:
-                    carry = True
-                    sol = time_list[0]
-                else :
-                    carry = False
-                    sol = tmp[1]
+            sol = tmp[0]
         return sol, carry
 
     def __prev_time(self, time_list, item):

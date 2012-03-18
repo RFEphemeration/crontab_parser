@@ -3,7 +3,7 @@
 
 
 
->>> e = SimpleCrontabEntry('30 8 10 06 *')
+>>> e = SimpleCrontabEntry('30 8 10 6 *')
 
 >>> e.next_run(datetime(1970, 1, 1))
 datetime.datetime(1970, 6, 10, 8, 30)
