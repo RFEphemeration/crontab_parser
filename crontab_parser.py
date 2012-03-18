@@ -450,10 +450,12 @@ class SimpleCrontabEntry(object):
 
         # month
         prev_month, carry = self.__prev_time(self.fields['month'], base.month)
-        old_base = base
         try:
+            prev_year = base.year
+            if carry:
+                prev_year-=1
             month_diff = datetime.date(base.year, base.month, base.day) - \
-                         datetime.date(base.year, prev_month, base.day)
+                         datetime.date(prev_year, prev_month, base.day)
 
             base -= month_diff
             return base

@@ -27,3 +27,8 @@ datetime.datetime(1970, 6, 10, 8, 30)
 
 >>> e.next_run(datetime(1970, 6, 10, 8, 30))
 datetime.datetime(1971, 6, 10, 8, 30)
+
+
+
+>>> e.prev_run(datetime(1970, 1, 1))
+datetime.datetime(1969, 6, 10, 8, 30)
