@@ -1,0 +1,26 @@
+>>> from crontab_parser import SimpleCrontabEntry
+>>> from datetime import datetime
+
+
+
+>>> e = SimpleCrontabEntry('30 8 10 06 *')
+
+>>> e.next_run(datetime(1970, 1, 1))
+datetime.datetime(1970, 6, 10, 8, 30)
+>>> e.next_run(datetime(1970, 4, 1))
+datetime.datetime(1970, 6, 10, 8, 30)
+
+>>> e.next_run(datetime(1970, 6, 1))
+datetime.datetime(1970, 6, 10, 8, 30)
+>>> e.next_run(datetime(1970, 6, 6))
+datetime.datetime(1970, 6, 10, 8, 30)
+
+>>> e.next_run(datetime(1970, 6, 10))
+datetime.datetime(1970, 6, 10, 8, 30)
+>>> e.next_run(datetime(1970, 6, 10, 4))
+datetime.datetime(1970, 6, 10, 8, 30)
+
+>>> e.next_run(datetime(1970, 6, 10, 8))
+datetime.datetime(1970, 6, 10, 8, 30)
+>>> e.next_run(datetime(1970, 6, 10, 8, 15))
+datetime.datetime(1970, 6, 10, 8, 30)
