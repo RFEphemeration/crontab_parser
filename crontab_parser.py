@@ -225,7 +225,7 @@ class SimpleCrontabEntry(object):
         return sol, carry
 
     def __prev_time(self, time_list, item):
-        """Little helper function to find next element on the list"""
+        """Little helper function to find previous element on the list"""
         pos = time_list.index(item)
         elem = time_list[pos-1]
         carry = elem >= time_list[pos]
@@ -384,6 +384,29 @@ class SimpleCrontabEntry(object):
             except:
                 return self.next_run(datetime.datetime(time.year+1, 1, 1, 0, 0))
 
+    def __prev_date(self, base, prev_day, carry_day):
+        if carry_day:
+            prev_month=base.month
+            prev_year=base.year
+            i = 0
+            for i in xrange(7):
+                prev_month, carry_month = self.__prev_time(self.fields['month'], prev_month)
+                if carry_month:
+                    prev_year -= 1
+                try:
+                    date = datetime.datetime(prev_year, prev_month, prev_day, base.hour, base.minute)
+                except ValueError:
+                    pass
+                else:
+                    if date.weekday() in self.fields['weekday']:
+                        base = date
+                        break
+            else:
+                raise ValueError('Can\'t find previous run time for date %s' % base)
+        else:
+            base = datetime.datetime(base.year, base.month, prev_day, base.hour, base.minute)
+        return base
+    
     def prev_run(self, time = datetime.datetime.now()):
         """Calculates when the previous execution was."""
         base = self.matches(time) and time or self.next_run(time)
@@ -401,80 +424,25 @@ class SimpleCrontabEntry(object):
         if not carry :
             return base
 
-        # day
-        try:
-            prev_day, carry_day = self.__prev_time(self.fields['day'], base.day)
-            day_diff = datetime.timedelta(days=(base.day - prev_day))
-            prev_weekday, carry_weekday = self.__prev_time(self.fields['weekday'], base.weekday()+1)
-        except:
-            try:
-                return self.prev_run(datetime.datetime(base.year, base.month+1, 1, 0, 0))
-            except:
-                return self.prev_run(datetime.datetime(base.year+1, 1, 1, 0, 0))
-       # if we have all days but we don't have all weekdays we need to
-        # perform different
-        if len(self.fields['day']) == 31 and len(self.fields['weekday']) != 8:
-            # Both 0 and 7 represent sunday
-            prev_weekday -= 1
-            if prev_weekday < 0 : prev_weekday = 6
+        # day and weekday are strongly depend on month and year
 
-            if carry_weekday :
-                day_diff = datetime.timedelta(days=7+base.weekday() - prev_weekday)
-                carry = base.month != (base - day_diff).month
-            else :
-                weekday_diff = datetime.timedelta(days=base.weekday() - prev_weekday)
-                # weekday no es en el otro mes
-                day_diff = min([day_diff, weekday_diff])
-                carry = False
-
-        elif len(self.fields['weekday']) != 8:
-            # Both 0 and 7 represent sunday
-            prev_weekday -= 1
-            if prev_weekday < 0 : prev_weekday = 6
-            weekday_diff = datetime.timedelta(days=base.weekday() - prev_weekday)
-
-            if carry_weekday :
-                weekday_diff += datetime.timedelta(weeks=1)
-                if carry_day :
-                    # ambos son el otro mes
-                    day_diff = max([day_diff, weekday_diff])
-                    carry = True
-                else :
-                    # el day simple esta en el mismo mes y el weekday en otro
-                    pass
-            else :
-                # weekday no es en el otro mes
-                if carry_day :
-                    # el day esta en el otro mes y el weekday no
-                    prev_day = weekday_diff
-                    carry = False
-                else :
-                    # ambos estan el el mero mes
-                    day_diff = min([day_diff, weekday_diff])
-                    carry = False
-
-        else :
-            carry = carry_day
-        base -= day_diff
-        if not carry :
-            return base
-
-        # month
-        prev_month, carry = self.__prev_time(self.fields['month'], base.month)
-        try:
-            prev_year = base.year
-            if carry:
-                prev_year-=1
-            month_diff = datetime.date(base.year, base.month, base.day) - \
-                         datetime.date(prev_year, prev_month, base.day)
-
-            base -= month_diff
-            return base
-        except:
-            cal = calendar.Calendar()
-            print "FAIL" + str(base)
-            return self.prev_run(datetime.datetime(base.year, base.month-1, len(list(cal.itermonthdays(base.year, base.month-1)))+1), 23, 59, 59)
-
+        prev_run = None
+        completed = False
+        prev_day, carry_day = self.__prev_time(self.fields['day'], base.day)
+        _carry_day = False
+        while 28 < prev_day and not _carry_day:
+            date = self.__prev_date(base, prev_day, carry_day)
+            if not prev_run or prev_run < date:
+                prev_run = date
+            _prev_day = prev_day
+            prev_day, _carry_day = self.__prev_time(self.fields['day'], prev_day)
+            carry_day = carry_day or _carry_day
+        date = self.__prev_date(base, prev_day, carry_day)
+        if not prev_run or prev_run < date:
+            prev_run = date
+            
+        return prev_run
+    
     def is_expired(self, time = datetime.datetime.now()):
         """If the expiration parameter has been set this will check
         wether too much time has been since the cron-entry. If the
