@@ -23,7 +23,6 @@
 
 import re
 import datetime
-import calendar
 
 class SimpleCrontabEntry(object):
     """Contrab-like parser.
